@@ -1,5 +1,5 @@
 const express = require("express");
-const { getThumbnailFromSahibinden } = require("./scraper"); // Sahibinden scraper
+const { getThumbnailFromSahibinden, getThumbnailFromLetgo } = require("./scraper"); // Sahibinden scraper
 // const { getThumbnailFromLetgo } = require("./letgoScraper"); // Letgo scraper (example)
 
 const app = express();
