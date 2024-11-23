@@ -25,11 +25,19 @@ const getFromSahibinden = async (url) => {
 		await page.setViewport(viewPortOptions);
 		await page.setExtraHTTPHeaders(ExtraHTTPHeadersOptions);
 		await page.goto(url);
+		//Gets image
 		const image = await page.waitForSelector(".stdImg");
 		const src = await image.evaluate((img) => img.src);
+		//Gets title
+		const titleContainer = await page.waitForSelector(".classifiedDetailTitle");
+		const title = await titleContainer.evaluate((container) => {
+			const query = container.querySelector("h1");
+			return query.textContent.trim().toLowerCase();
+		});
+		//Gets price
 		const price = await page.waitForSelector(".classified-price-wrapper");
 		const value = await price.evaluate((price) => price.textContent.trim());
-		return { src, value };
+		return { src, value, title };
 	} catch (error) {
 		throw error;
 	} finally {
@@ -51,18 +59,24 @@ const getFromLetgo = async (url) => {
 		await page.setViewport(viewPortOptions);
 		await page.setExtraHTTPHeaders(ExtraHTTPHeadersOptions);
 		await page.goto(url);
+		//Gets image
 		const imageContainer = await page.waitForSelector(".img-container");
 		const src = await imageContainer.evaluate((container) => {
 			const img = container.querySelector("img");
 			return img.src;
 		});
+		//Gets price
+		const titleContent = await page.waitForSelector(".ad-name");
+		const title = await titleContent.evaluate((price) => price.textContent.trim().toLowerCase());
+
+		//Gets price
 		const priceContainer = await page.waitForSelector(".summary-upper");
 		const value = await priceContainer.evaluate((container) => {
 			const img = container.querySelector("h2");
 			return img.textContent.trim();
 		});
 
-		return { src, value };
+		return { src, value, title };
 	} catch (error) {
 		throw error;
 	} finally {
@@ -83,14 +97,22 @@ const getFromHepsiEmlak = async (url) => {
 		await page.setViewport(viewPortOptions);
 		await page.setExtraHTTPHeaders(ExtraHTTPHeadersOptions);
 		await page.goto(url);
+		//Gets image
 		const imageContainer = await page.waitForSelector(".img-wrapper");
 		const src = await imageContainer.evaluate((container) => {
 			const img = container.querySelector("img");
 			return img.src;
 		});
+		//Gets title
+		const titleContainer = await page.waitForSelector(".det-title-upper");
+		const title = await titleContainer.evaluate((container) => {
+			const query = container.querySelector("h1");
+			return query.textContent.trim().toLowerCase();
+		});
+		//Gets price
 		const price = await page.waitForSelector(".fz24-text.price");
 		const value = await price.evaluate((price) => price.textContent.trim());
-		return { src, value };
+		return { src, value, title };
 	} catch (error) {
 		throw error;
 	} finally {

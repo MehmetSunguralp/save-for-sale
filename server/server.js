@@ -41,7 +41,9 @@ app.post("/thumbnail", async (req, res) => {
 		}
 
 		// Send the response
-		res.status(200).json({ success: true, src: advertisementSrc.src, price: advertisementSrc.value });
+		res
+			.status(200)
+			.json({ success: true, src: advertisementSrc.src, title: advertisementSrc.title, price: advertisementSrc.value });
 	} catch (error) {
 		console.error("Error fetching thumbnail:", error);
 		res.status(500).json({ success: false, message: "Failed to fetch thumbnail", error });
