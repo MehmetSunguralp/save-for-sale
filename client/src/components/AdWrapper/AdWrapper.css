@@ -7,11 +7,8 @@
 	justify-content: space-around;
 	background-color: var(--light);
 }
-.header .main-title {
-	text-transform: capitalize;
-	font-weight: 600;
-	color: var(--icy);
-	font-size: 30px;
+.header .main-logo {
+	width: 40px;
 }
 
 .header .add-btn {
