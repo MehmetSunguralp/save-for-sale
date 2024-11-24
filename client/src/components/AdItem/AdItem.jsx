@@ -1,8 +1,8 @@
-import sahibinden from "../../../public/sahibinden.svg";
-import letgo from "../../../public/letgo.svg";
-import emlakjet from "../../../public/emlakjet.svg";
-import hepsiemlak from "../../../public/hepsiemlak.svg";
-import arabam from "../../../public/arabam.svg";
+import sahibinden from "/sahibinden.svg";
+import letgo from "/letgo.svg";
+import emlakjet from "/emlakjet.svg";
+import hepsiemlak from "/hepsiemlak.svg";
+import arabam from "/arabam.svg";
 
 import "./AdItem.css";
 export const AdItem = ({ listingData }) => {
@@ -26,11 +26,7 @@ export const AdItem = ({ listingData }) => {
 	}
 
 	return (
-		<a
-			href={listingData.url}
-			target="_blank"
-			className="ad-item"
-		>
+		<a href={listingData.url} target="_blank" className="ad-item">
 			<img src={listingData.src} alt="ad-thumbnail" className="thumbnail" />
 			<div className="text-content">
 				<h2 className="title">{listingData.title}</h2>

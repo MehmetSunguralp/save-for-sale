@@ -14,16 +14,42 @@
 	font-size: 30px;
 }
 
+.header .add-btn {
+	font-family: var(--font);
+	font-size: 18px;
+	height: 36px;
+	width: 120px;
+	border-radius: 100px;
+	border: none;
+	background-color: var(--mid);
+	color: var(--white);
+	font-weight: 500;
+	transition: all 0.2s ease-in-out;
+	cursor: pointer;
+}
+.header .add-btn:hover {
+	background-color: var(--white);
+	color: var(--mid);
+}
+
 .ad-list-wrapper {
 	display: flex;
 	flex-direction: column;
 	gap: 10px;
 	align-items: center;
-	max-height: 540px;
+	height: 540px;
 	overflow: auto;
 	scrollbar-gutter: stable;
 	background-color: var(--dark);
 	padding-block: 10px;
+}
+.ad-list-wrapper .no-ad-warning {
+	font-size: 24px;
+	color: var(--white);
+}
+
+.ad-list-wrapper .no-ad-warning span {
+	font-weight: 600;
 }
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
