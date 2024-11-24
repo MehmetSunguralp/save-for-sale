@@ -13,7 +13,7 @@ export const AdWrapper = ({ list }) => {
 	if (list) {
 		return (
 			<div className="ad-list-wrapper">
-				{list.map((listingData, index) => {
+				{list.reverse().map((listingData, index) => {
 					return <AdItem listingData={listingData} key={index} />;
 				})}
 			</div>

@@ -12,8 +12,8 @@
 }
 
 .ad-item .thumbnail {
-	width: 120px;
-	height: 120px;
+	width: 100px;
+	height: 100px;
 	object-fit: cover;
 	border-radius: 10px;
 	box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.5);
@@ -35,6 +35,10 @@
 	font-size: 24px;
 	font-weight: 600;
 	color: var(--white);
+}
+
+.site-logo {
+	width: 30px;
 }
 
 .ad-item:hover {

@@ -1,6 +1,30 @@
+import sahibinden from "../../../public/sahibinden.svg";
+import letgo from "../../../public/letgo.svg";
+import emlakjet from "../../../public/emlakjet.svg";
+import hepsiemlak from "../../../public/hepsiemlak.svg";
+import arabam from "../../../public/arabam.svg";
+
 import "./AdItem.css";
 export const AdItem = ({ listingData }) => {
-	console.log(listingData);
+	let logo;
+	switch (listingData.color) {
+		case "#FFE800":
+			logo = sahibinden;
+			break;
+		case "#FF3F55":
+			logo = letgo;
+			break;
+		case "#09E524":
+			logo = emlakjet;
+			break;
+		case "#E1251B":
+			logo = hepsiemlak;
+			break;
+		case "#F9011B":
+			logo = arabam;
+			break;
+	}
+
 	return (
 		<a
 			href={listingData.url}
@@ -13,6 +37,7 @@ export const AdItem = ({ listingData }) => {
 				<h2 className="title">{listingData.title}</h2>
 				<p className="price">{listingData.price}</p>
 			</div>
+			<img className="site-logo" src={logo} alt="site-logo" />
 		</a>
 	);
 };
