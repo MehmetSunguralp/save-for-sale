@@ -39,10 +39,10 @@ app.post("/thumbnail", async (req, res) => {
 		} else if (domain === "arabam.com") {
 			advertisementSrc = await getFromArabam(url);
 		} else {
-			console.error("No scraper available for this domain:", domain);
+			console.error("Invalid domain:", domain);
 			return res.status(400).json({
 				success: false,
-				message: `No scraper available for the domain: ${domain}`,
+				message: `Invalid domain: ${domain}`,
 			});
 		}
 

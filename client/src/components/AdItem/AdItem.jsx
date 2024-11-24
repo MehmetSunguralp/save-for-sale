@@ -30,7 +30,6 @@ export const AdItem = ({ listingData }) => {
 			href={listingData.url}
 			target="_blank"
 			className="ad-item"
-			/* 	style={{ backgroundImage: `linear-gradient(to right, ${listingData.color}, #000)` }} */
 		>
 			<img src={listingData.src} alt="ad-thumbnail" className="thumbnail" />
 			<div className="text-content">

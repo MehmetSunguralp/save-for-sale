@@ -1,21 +1,30 @@
 import { useEffect } from "react";
-import { createAd } from "../../utils/api";
+import { createAd, refreshAds } from "../../utils/api";
 import "./AdWrapper.css";
 
 import React from "react";
 import { AdItem } from "../AdItem/AdItem";
 
 export const AdWrapper = ({ list }) => {
-	//console.log(list);
-	/* useEffect(() => {
-		createAd("https://www.hepsiemlak.com/ankara-polatli-mehmet-akif-kiralik/daire/151732-10");
-	}, []); */
+	const currentDomainPath = window.location.href;
+
+	const handleDomain = () => {
+		createAd(currentDomainPath);
+	};
 	if (list) {
 		return (
-			<div className="ad-list-wrapper">
-				{list.reverse().map((listingData, index) => {
-					return <AdItem listingData={listingData} key={index} />;
-				})}
+			<div>
+				<div className="header">
+					<label className="main-title">Save-For-Sale</label>
+					<button className="add-btn" onClick={refreshAds}>
+						Yenile
+					</button>
+				</div>
+				<div className="ad-list-wrapper">
+					{list.reverse().map((listingData, index) => {
+						return <AdItem listingData={listingData} key={index} />;
+					})}
+				</div>
 			</div>
 		);
 	}

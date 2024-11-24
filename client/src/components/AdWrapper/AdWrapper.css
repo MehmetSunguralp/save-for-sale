@@ -1,5 +1,19 @@
 @import url("../../_variables.css");
 
+.header {
+	height: 50px;
+	display: flex;
+	align-items: center;
+	justify-content: space-around;
+	background-color: var(--light);
+}
+.header .main-title {
+	text-transform: capitalize;
+	font-weight: 600;
+	color: var(--icy);
+	font-size: 30px;
+}
+
 .ad-list-wrapper {
 	display: flex;
 	flex-direction: column;
@@ -9,6 +23,7 @@
 	overflow: auto;
 	scrollbar-gutter: stable;
 	background-color: var(--dark);
+	padding-block: 10px;
 }
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
