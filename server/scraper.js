@@ -124,9 +124,43 @@ const getFromHepsiEmlak = async (url) => {
 		}
 	}
 };
+const getFromEmlakJet = async (url) => {
+	try {
+		const { browser: connectedBrowser, page: connectedPage } = await connect(connectOptions);
+		browser = connectedBrowser;
+		page = connectedPage;
+
+		await page.setViewport(viewPortOptions);
+		await page.setExtraHTTPHeaders(ExtraHTTPHeadersOptions);
+		await page.goto(url);
+		//Gets image
+		const imageContainer = await page.waitForSelector("._1L9i7q");
+		const src = await imageContainer.evaluate((container) => {
+			const img = container.querySelector("img");
+			return img.src;
+		});
+		//Gets title
+		const titleContent = await page.waitForSelector("._3OKyci");
+		const title = await titleContent.evaluate((price) => price.textContent.trim().toLowerCase());
+		//Gets price
+		const price = await page.waitForSelector("._2TxNQv");
+		const value = await price.evaluate((price) => price.textContent.trim());
+		return { src, value, title };
+	} catch (error) {
+		throw error;
+	} finally {
+		if (page) {
+			await page.close();
+		}
+		if (browser) {
+			await browser.close();
+		}
+	}
+};
 
 module.exports = {
 	getFromSahibinden,
 	getFromLetgo,
 	getFromHepsiEmlak,
+	getFromEmlakJet,
 };
