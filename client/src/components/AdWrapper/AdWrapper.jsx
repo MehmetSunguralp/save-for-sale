@@ -6,7 +6,7 @@ import React from "react";
 
 export const AdWrapper = () => {
 	useEffect(() => {
-		createAd("https://www.hepsiemlak.com/ankara-polatli-mehmet-akif-kiralik/daire/151732-10");
+		createAd("https://www.sahibinden.com/ilan/ozel-ders-verenler-yabanci-dil-almanca-dersi-1153549516/detay/");
 	}, []);
 	return <div>AdWrapper</div>;
 };
