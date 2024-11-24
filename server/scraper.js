@@ -37,6 +37,7 @@ const getFromSahibinden = async (url) => {
 		//Gets price
 		const price = await page.waitForSelector(".classified-price-wrapper");
 		const value = await price.evaluate((price) => price.textContent.trim());
+		//Returns data
 		return { src, value, title };
 	} catch (error) {
 		throw error;
@@ -75,7 +76,7 @@ const getFromLetgo = async (url) => {
 			const img = container.querySelector("h2");
 			return img.textContent.trim();
 		});
-
+		//Returns data
 		return { src, value, title };
 	} catch (error) {
 		throw error;
@@ -112,6 +113,7 @@ const getFromHepsiEmlak = async (url) => {
 		//Gets price
 		const price = await page.waitForSelector(".fz24-text.price");
 		const value = await price.evaluate((price) => price.textContent.trim());
+		//Returns data
 		return { src, value, title };
 	} catch (error) {
 		throw error;
@@ -145,6 +147,42 @@ const getFromEmlakJet = async (url) => {
 		//Gets price
 		const price = await page.waitForSelector("._2TxNQv");
 		const value = await price.evaluate((price) => price.textContent.trim());
+		//Returns data
+		return { src, value, title };
+	} catch (error) {
+		throw error;
+	} finally {
+		if (page) {
+			await page.close();
+		}
+		if (browser) {
+			await browser.close();
+		}
+	}
+};
+const getFromArabam = async (url) => {
+	try {
+		const { browser: connectedBrowser, page: connectedPage } = await connect(connectOptions);
+		browser = connectedBrowser;
+		page = connectedPage;
+
+		await page.setViewport(viewPortOptions);
+		await page.setExtraHTTPHeaders(ExtraHTTPHeadersOptions);
+		await page.goto(url);
+		//Gets image
+		//Gets image
+		const imageContainer = await page.waitForSelector(".swiper-wrapper");
+		const src = await imageContainer.evaluate((container) => {
+			const img = container.querySelector(".swiper-lazy.swiper-main-img.swiper-lazy-loaded");
+			return img.src;
+		});
+		//Gets title
+		const titleContent = await page.waitForSelector(".product-name-container");
+		const title = await titleContent.evaluate((price) => price.textContent.trim().toLowerCase());
+		//Gets price
+		const price = await page.waitForSelector(".product-price");
+		const value = await price.evaluate((price) => price.textContent.trim());
+		//Returns data
 		return { src, value, title };
 	} catch (error) {
 		throw error;
@@ -163,4 +201,5 @@ module.exports = {
 	getFromLetgo,
 	getFromHepsiEmlak,
 	getFromEmlakJet,
+	getFromArabam,
 };

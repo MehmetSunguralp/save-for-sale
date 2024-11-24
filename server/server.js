@@ -1,5 +1,5 @@
 const express = require("express");
-const { getFromSahibinden, getFromLetgo, getFromHepsiEmlak, getFromEmlakJet } = require("./scraper");
+const { getFromSahibinden, getFromLetgo, getFromHepsiEmlak, getFromEmlakJet, getFromArabam } = require("./scraper");
 
 const app = express();
 const port = 3000;
@@ -31,6 +31,8 @@ app.post("/thumbnail", async (req, res) => {
 			advertisementSrc = await getFromHepsiEmlak(url);
 		} else if (domain === "emlakjet.com") {
 			advertisementSrc = await getFromEmlakJet(url);
+		} else if (domain === "arabam.com") {
+			advertisementSrc = await getFromArabam(url);
 		} else {
 			return res.status(400).json({
 				success: false,
