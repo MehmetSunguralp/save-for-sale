@@ -1,11 +1,12 @@
 const express = require("express");
+const cors = require("cors");
 const { getFromSahibinden, getFromLetgo, getFromHepsiEmlak, getFromEmlakJet, getFromArabam } = require("./scraper");
 
 const app = express();
 const port = 3000;
 
 app.use(express.json());
-
+app.use(cors());
 app.post("/thumbnail", async (req, res) => {
 	try {
 		const { url } = req.body;
