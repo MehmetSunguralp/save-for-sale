@@ -6,7 +6,10 @@ export const createAd = async (url) => {
 			.post("http://localhost:3000/thumbnail", {
 				url: url,
 			})
-			.then((response) => console.log(response.data));
+			.then((response) => {
+				console.log(response.data);
+				return;
+			});
 	} catch (error) {
 		console.error(error);
 	}

@@ -5,7 +5,7 @@ let page = null;
 
 const connectOptions = {
 	headless: false,
-	args: [],
+	args: ["--disable-features=site-per-process"],
 	customConfig: {},
 	turnstile: true,
 	connectOption: {},
@@ -16,185 +16,121 @@ const connectOptions = {
 const viewPortOptions = { width: 1024, height: 768 };
 const ExtraHTTPHeadersOptions = { "accept-language": "en-US,en;q=0.9" };
 
-const getFromSahibinden = async (url) => {
+async function safeGoto(page, url, retries = 3) {
+	for (let attempt = 1; attempt <= retries; attempt++) {
+		try {
+			await page.goto(url, { waitUntil: "domcontentloaded", timeout: 60000 });
+			return; // Success
+		} catch (error) {
+			console.error(`Attempt ${attempt} failed:`, error.message);
+			if (attempt === retries) throw error; // Throw error after max retries
+		}
+	}
+}
+
+async function safeEvaluate(page, selector, evaluateFn, errorMessage) {
+	try {
+		const element = await page.waitForSelector(selector, { timeout: 10000 });
+		return await element.evaluate(evaluateFn);
+	} catch (error) {
+		console.error(errorMessage, error.message);
+		return null; // Return null if the selector is not found or frame detaches
+	}
+}
+
+async function scrapeWebsite(url, selectors) {
 	try {
 		const { browser: connectedBrowser, page: connectedPage } = await connect(connectOptions);
 		browser = connectedBrowser;
-		page = connectedPage;
+		//page = connectedPage;
+		const [page] = await browser.pages();
 
 		await page.setViewport(viewPortOptions);
 		await page.setExtraHTTPHeaders(ExtraHTTPHeadersOptions);
-		await page.goto(url);
-		//Gets image
-		const image = await page.waitForSelector(".stdImg");
-		const src = await image.evaluate((img) => img.src);
-		//Gets title
-		const titleContainer = await page.waitForSelector(".classifiedDetailTitle");
-		const title = await titleContainer.evaluate((container) => {
-			const query = container.querySelector("h1");
-			return query.textContent.trim().toLowerCase();
-		});
-		//Gets price
-		const price = await page.waitForSelector(".classified-price-wrapper");
-		const value = await price.evaluate((price) => price.textContent.trim());
-		//Returns data
+
+		await page.waitForSelector("body", { timeout: 10000 });
+		// Navigate to URL with retries
+		await safeGoto(page, url);
+
+		// Extract data
+		const src = await safeEvaluate(
+			page,
+			selectors.image,
+			(el) => el.src,
+			`Failed to extract image from selector: ${selectors.image}`
+		);
+
+		const title = await safeEvaluate(
+			page,
+			selectors.title,
+			(el) => el.textContent.trim().toLowerCase(),
+			`Failed to extract title from selector: ${selectors.title}`
+		);
+
+		const value = await safeEvaluate(
+			page,
+			selectors.price,
+			(el) => el.textContent.trim(),
+			`Failed to extract price from selector: ${selectors.price}`
+		);
+		// Return extracted data
 		return { src, value, title };
 	} catch (error) {
+		console.error("Scraping failed:", error.message);
 		throw error;
 	} finally {
-		if (page) {
-			await page.close();
+		// Ensure page and browser are closed
+		if (page && !page.isClosed()) {
+			try {
+				await page.close();
+			} catch (closeError) {
+				console.error("Failed to close page:", closeError.message);
+			}
 		}
-		if (browser) {
-			await browser.close();
+		if (browser && browser.isConnected()) {
+			try {
+				await browser.close();
+			} catch (closeError) {
+				console.error("Failed to close browser:", closeError.message);
+			}
 		}
+		if (browser && browser.process() != null) browser.process().kill("SIGINT");
 	}
-};
+}
 
-const getFromLetgo = async (url) => {
-	try {
-		const { browser: connectedBrowser, page: connectedPage } = await connect(connectOptions);
-		browser = connectedBrowser;
-		page = connectedPage;
+const getFromSahibinden = (url) =>
+	scrapeWebsite(url, {
+		image: ".stdImg",
+		title: ".classifiedDetailTitle h1",
+		price: ".classified-price-wrapper",
+	});
+const getFromLetgo = (url) =>
+	scrapeWebsite(url, {
+		image: ".img-container img",
+		title: ".ad-name",
+		price: ".summary-upper h2",
+	});
 
-		await page.setViewport(viewPortOptions);
-		await page.setExtraHTTPHeaders(ExtraHTTPHeadersOptions);
-		await page.goto(url);
-		//Gets image
-		const imageContainer = await page.waitForSelector(".img-container");
-		const src = await imageContainer.evaluate((container) => {
-			const img = container.querySelector("img");
-			return img.src;
-		});
-		//Gets price
-		const titleContent = await page.waitForSelector(".ad-name");
-		const title = await titleContent.evaluate((price) => price.textContent.trim().toLowerCase());
+const getFromHepsiEmlak = (url) =>
+	scrapeWebsite(url, {
+		image: ".img-wrapper img",
+		title: ".det-title-upper h1",
+		price: ".fz24-text.price",
+	});
 
-		//Gets price
-		const priceContainer = await page.waitForSelector(".summary-upper");
-		const value = await priceContainer.evaluate((container) => {
-			const img = container.querySelector("h2");
-			return img.textContent.trim();
-		});
-		//Returns data
-		return { src, value, title };
-	} catch (error) {
-		throw error;
-	} finally {
-		if (page) {
-			await page.close();
-		}
-		if (browser) {
-			await browser.close();
-		}
-	}
-};
-const getFromHepsiEmlak = async (url) => {
-	try {
-		const { browser: connectedBrowser, page: connectedPage } = await connect(connectOptions);
-		browser = connectedBrowser;
-		page = connectedPage;
+const getFromEmlakJet = (url) =>
+	scrapeWebsite(url, {
+		image: "._1L9i7q img",
+		title: "._3OKyci",
+		price: "._2TxNQv",
+	});
 
-		await page.setViewport(viewPortOptions);
-		await page.setExtraHTTPHeaders(ExtraHTTPHeadersOptions);
-		await page.goto(url);
-		//Gets image
-		const imageContainer = await page.waitForSelector(".img-wrapper");
-		const src = await imageContainer.evaluate((container) => {
-			const img = container.querySelector("img");
-			return img.src;
-		});
-		//Gets title
-		const titleContainer = await page.waitForSelector(".det-title-upper");
-		const title = await titleContainer.evaluate((container) => {
-			const query = container.querySelector("h1");
-			return query.textContent.trim().toLowerCase();
-		});
-		//Gets price
-		const price = await page.waitForSelector(".fz24-text.price");
-		const value = await price.evaluate((price) => price.textContent.trim());
-		//Returns data
-		return { src, value, title };
-	} catch (error) {
-		throw error;
-	} finally {
-		if (page) {
-			await page.close();
-		}
-		if (browser) {
-			await browser.close();
-		}
-	}
-};
-const getFromEmlakJet = async (url) => {
-	try {
-		const { browser: connectedBrowser, page: connectedPage } = await connect(connectOptions);
-		browser = connectedBrowser;
-		page = connectedPage;
-
-		await page.setViewport(viewPortOptions);
-		await page.setExtraHTTPHeaders(ExtraHTTPHeadersOptions);
-		await page.goto(url);
-		//Gets image
-		const imageContainer = await page.waitForSelector("._1L9i7q");
-		const src = await imageContainer.evaluate((container) => {
-			const img = container.querySelector("img");
-			return img.src;
-		});
-		//Gets title
-		const titleContent = await page.waitForSelector("._3OKyci");
-		const title = await titleContent.evaluate((price) => price.textContent.trim().toLowerCase());
-		//Gets price
-		const price = await page.waitForSelector("._2TxNQv");
-		const value = await price.evaluate((price) => price.textContent.trim());
-		//Returns data
-		return { src, value, title };
-	} catch (error) {
-		throw error;
-	} finally {
-		if (page) {
-			await page.close();
-		}
-		if (browser) {
-			await browser.close();
-		}
-	}
-};
-const getFromArabam = async (url) => {
-	try {
-		const { browser: connectedBrowser, page: connectedPage } = await connect(connectOptions);
-		browser = connectedBrowser;
-		page = connectedPage;
-
-		await page.setViewport(viewPortOptions);
-		await page.setExtraHTTPHeaders(ExtraHTTPHeadersOptions);
-		await page.goto(url);
-		//Gets image
-		//Gets image
-		const imageContainer = await page.waitForSelector(".swiper-wrapper");
-		const src = await imageContainer.evaluate((container) => {
-			const img = container.querySelector(".swiper-lazy.swiper-main-img.swiper-lazy-loaded");
-			return img.src;
-		});
-		//Gets title
-		const titleContent = await page.waitForSelector(".product-name-container");
-		const title = await titleContent.evaluate((price) => price.textContent.trim().toLowerCase());
-		//Gets price
-		const price = await page.waitForSelector(".product-price");
-		const value = await price.evaluate((price) => price.textContent.trim());
-		//Returns data
-		return { src, value, title };
-	} catch (error) {
-		throw error;
-	} finally {
-		if (page) {
-			await page.close();
-		}
-		if (browser) {
-			await browser.close();
-		}
-	}
-};
+const getFromArabam = (url) =>
+	scrapeWebsite(url, {
+		image: ".swiper-wrapper .swiper-lazy.swiper-main-img.swiper-lazy-loaded",
+		title: ".product-name-container",
+		price: ".product-price",
+	});
 
 module.exports = {
 	getFromSahibinden,

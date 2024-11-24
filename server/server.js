@@ -10,17 +10,21 @@ app.use(cors());
 app.post("/thumbnail", async (req, res) => {
 	try {
 		const { url } = req.body;
+		console.log("Received URL:", url);
 
 		if (!url || url.length === 0) {
+			console.error("URL is missing");
 			return res.status(400).json({ success: false, message: "URL is required" });
 		}
 
 		const domainMatch = url.match(/^https?:\/\/(www\.)?([^\/]+)/);
 		if (!domainMatch) {
+			console.error("Invalid URL format");
 			return res.status(400).json({ success: false, message: "Invalid URL format" });
 		}
 
 		const domain = domainMatch[2];
+		console.log("Domain:", domain);
 
 		let advertisementSrc;
 
@@ -35,17 +39,24 @@ app.post("/thumbnail", async (req, res) => {
 		} else if (domain === "arabam.com") {
 			advertisementSrc = await getFromArabam(url);
 		} else {
+			console.error("No scraper available for this domain:", domain);
 			return res.status(400).json({
 				success: false,
 				message: `No scraper available for the domain: ${domain}`,
 			});
 		}
-		res
-			.status(200)
-			.json({ success: true, src: advertisementSrc.src, title: advertisementSrc.title, price: advertisementSrc.value });
+
+		console.log("Scraping result:", advertisementSrc);
+
+		res.status(200).json({
+			success: true,
+			src: advertisementSrc.src,
+			title: advertisementSrc.title,
+			price: advertisementSrc.value,
+		});
 	} catch (error) {
-		console.error("Error fetching thumbnail:", error);
-		res.status(500).json({ success: false, message: "Failed to fetch thumbnail", error });
+		console.error("Error in /thumbnail:", error); // Log full error
+		res.status(500).json({ success: false, message: "Failed to fetch thumbnail", error: error.message });
 	}
 });
 
