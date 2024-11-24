@@ -53,6 +53,8 @@ app.post("/thumbnail", async (req, res) => {
 			src: advertisementSrc.src,
 			title: advertisementSrc.title,
 			price: advertisementSrc.value,
+			color: advertisementSrc.color,
+			url: advertisementSrc.url,
 		});
 	} catch (error) {
 		console.error("Error in /thumbnail:", error); // Log full error

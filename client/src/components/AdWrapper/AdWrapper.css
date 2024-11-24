@@ -1,0 +1,24 @@
+@import url("../../_variables.css");
+
+.ad-list-wrapper {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	align-items: center;
+	max-height: 540px;
+	overflow: auto;
+	scrollbar-gutter: stable;
+	background-color: var(--dark);
+}
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+	width: 10px;
+}
+
+::-webkit-scrollbar-track {
+	background: #3e5c76;
+}
+
+::-webkit-scrollbar-thumb {
+	background: #748cab;
+}

@@ -74,7 +74,8 @@ async function scrapeWebsite(url, selectors) {
 			`Failed to extract price from selector: ${selectors.price}`
 		);
 		// Return extracted data
-		return { src, value, title };
+		const color = selectors.color;
+		return { src, value, title, color, url };
 	} catch (error) {
 		console.error("Scraping failed:", error.message);
 		throw error;
@@ -103,12 +104,14 @@ const getFromSahibinden = (url) =>
 		image: ".stdImg",
 		title: ".classifiedDetailTitle h1",
 		price: ".classified-price-wrapper",
+		color: "#FFE800",
 	});
 const getFromLetgo = (url) =>
 	scrapeWebsite(url, {
 		image: ".img-container img",
 		title: ".ad-name",
 		price: ".summary-upper h2",
+		color: "#FF3F55",
 	});
 
 const getFromHepsiEmlak = (url) =>
@@ -116,6 +119,7 @@ const getFromHepsiEmlak = (url) =>
 		image: ".img-wrapper img",
 		title: ".det-title-upper h1",
 		price: ".fz24-text.price",
+		color: "#E1251B",
 	});
 
 const getFromEmlakJet = (url) =>
@@ -123,6 +127,7 @@ const getFromEmlakJet = (url) =>
 		image: "._1L9i7q img",
 		title: "._3OKyci",
 		price: "._2TxNQv",
+		color: "#09E524",
 	});
 
 const getFromArabam = (url) =>
@@ -130,6 +135,7 @@ const getFromArabam = (url) =>
 		image: ".swiper-wrapper .swiper-lazy.swiper-main-img.swiper-lazy-loaded",
 		title: ".product-name-container",
 		price: ".product-price",
+		color: "#F9011B",
 	});
 
 module.exports = {
