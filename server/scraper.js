@@ -104,7 +104,7 @@ async function scrapeWebsite(url, selectors) {
 
 const getFromSahibinden = (url) =>
 	scrapeWebsite(url, {
-		image: ".thmbImg",
+		image: ".classifiedDetailMainPhoto #label_images_1 .stdImg",
 		title: ".classifiedDetailTitle h1",
 		price: ".classified-price-wrapper",
 		color: "#FFE800",
