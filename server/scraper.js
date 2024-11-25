@@ -4,8 +4,9 @@ let browser = null;
 let page = null;
 
 const connectOptions = {
-	headless: false,
-	args: ["--disable-features=site-per-process"],
+	headless: true,
+	devtools: true,
+	args: ["--disable-features=site-per-process", "--no-sandbox", "--disable-setuid-sandbox", "--disable-gpu"],
 	customConfig: {},
 	turnstile: true,
 	connectOption: {},
@@ -15,6 +16,8 @@ const connectOptions = {
 
 const viewPortOptions = { width: 1024, height: 768 };
 const ExtraHTTPHeadersOptions = { "accept-language": "en-US,en;q=0.9" };
+const userAgent =
+	"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36";
 
 async function safeGoto(page, url, retries = 3) {
 	for (let attempt = 1; attempt <= retries; attempt++) {
@@ -44,7 +47,7 @@ async function scrapeWebsite(url, selectors) {
 		browser = connectedBrowser;
 		//page = connectedPage;
 		const [page] = await browser.pages();
-
+		await page.setUserAgent(userAgent);
 		await page.setViewport(viewPortOptions);
 		await page.setExtraHTTPHeaders(ExtraHTTPHeadersOptions);
 
@@ -101,7 +104,7 @@ async function scrapeWebsite(url, selectors) {
 
 const getFromSahibinden = (url) =>
 	scrapeWebsite(url, {
-		image: ".stdImg",
+		image: ".thmbImg",
 		title: ".classifiedDetailTitle h1",
 		price: ".classified-price-wrapper",
 		color: "#FFE800",
