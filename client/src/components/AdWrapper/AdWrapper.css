@@ -37,6 +37,7 @@
 	height: 540px;
 	overflow: auto;
 	scrollbar-gutter: stable;
+	/* background-color: var(--dark); */
 	background-color: var(--dark);
 	padding-block: 10px;
 }

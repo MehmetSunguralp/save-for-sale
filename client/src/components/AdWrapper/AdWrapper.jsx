@@ -7,11 +7,12 @@ import { AdItem } from "../AdItem/AdItem";
 
 export const AdWrapper = ({ list }) => {
 	// const currentDomainPath = window.location.href;
-	//const currentDomainPath = "https://www.sahibinden.com/ilan/ozel-ders-verenler-yabanci-dil-almanca-dersi-1153549516/detay/";
+	//const currentDomainPath =
+	//	"https://www.sahibinden.com/ilan/vasita-arazi-suv-pickup-mercedes-benz-sahibinden-mercedes-gl-1072817282/detay";
 	//const currentDomainPath = "https://www.emlakjet.com/ilan/ayrancilar-ege-kent-4de-31-kiralik-daire-cagri-emlaktan-10245254/";
-	const currentDomainPath = "https://www.hepsiemlak.com/ankara-polatli-fatih-kiralik/daire/151732-1";
+	//const currentDomainPath = "https://www.hepsiemlak.com/ankara-polatli-fatih-kiralik/daire/151732-1";
 	//const currentDomainPath = "https://www.arabam.com/ilan/galeriden-satilik-fiat-doblo-combi-1-3-multijet-safeline/2019-model-doblo-combi-1-3-multijet-safeline/26933812";
-	//const currentDomainPath = "https://www.letgo.com/item/bugaboo-bee-bebek-arabas-iid-1694381927";
+	const currentDomainPath = "https://www.letgo.com/item/orjinal-110-binde-iid-1697421085";
 
 	const handleDomain = () => {
 		let isInstanceOf = false;
