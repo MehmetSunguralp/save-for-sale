@@ -29,14 +29,15 @@ export const handleDomain = (currentDomainPath, setIsLoading, setAdListing) => {
 		});
 	} else {
 		setIsLoading(false);
-		alert("Geçersiz link!");
+		alert("Geçersiz link!" + currentDomainPath);
 	}
 };
 
-export const handleDelete = (url, adListing, setAdListing) => {
-	const updatedList = adListing.filter((ad) => ad.url !== url);
-	localStorage.setItem("adList", JSON.stringify(updatedList)); // Update localStorage
-	setAdListing(updatedList); // Update state
+export const handleDelete = (adUrl, setAdListing) => {
+	const adList = JSON.parse(localStorage.getItem("adList")) || [];
+	const updatedList = adList.filter((ad) => ad.url !== adUrl);
+	setAdListing(updatedList);
+	localStorage.setItem("adList", JSON.stringify(updatedList));
 };
 
 export const handleRefreshAll = async (setIsRefreshing, setLoadingMessage, setAdListing) => {

@@ -1,11 +1,12 @@
 @import url("../../_variables.css");
 
 .header {
-	height: 60px;
+	height: 80px;
 	display: flex;
 	align-items: center;
 	justify-content: space-around;
 	background-color: var(--mid);
+	padding-inline: 20px;
 }
 .header .main-logo {
 	width: 40px;
@@ -53,7 +54,7 @@
 	width: 30px;
 }
 .header .search-wrapper .search-input {
-	width: 320px;
+	width: 280px;
 	height: 40px;
 	border-radius: 50px;
 	border: none;

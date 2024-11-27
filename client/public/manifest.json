@@ -1,0 +1,10 @@
+{
+	"manifest_version": 3,
+	"name": "Save-for-Sale",
+	"version": "1.0",
+	"description": "Save advertisements",
+	"action": {
+		"default_popup": "index.html"
+	},
+	"permissions": ["activeTab", "storage", "tabs"]
+}

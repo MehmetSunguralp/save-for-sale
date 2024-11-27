@@ -9,16 +9,20 @@ import "./AdWrapper.css";
 
 import { AdItem } from "../AdItem/AdItem";
 
-const currentDomainPath =
-	"https://www.sahibinden.com/ilan/emlak-konut-kiralik-tasyaka-mah-cadde-uzerinde-full-esyali-kiralik-cati-dublex-daire-1213713171/detay";
-
 export const AdWrapper = ({ list }) => {
-	const [isLoading, setIsLoading] = useState(false); // General loading state
-	const [loadingMessage, setLoadingMessage] = useState(""); // Progress message
-	const [isRefreshing, setIsRefreshing] = useState(false); // Refresh state
-	const [adListing, setAdListing] = useState(list || []); // Ad list
-	const [searchQuery, setSearchQuery] = useState(""); // Search query
+	const [isLoading, setIsLoading] = useState(false);
+	const [loadingMessage, setLoadingMessage] = useState("");
+	const [isRefreshing, setIsRefreshing] = useState(false);
+	const [adListing, setAdListing] = useState(list || []);
+	const [searchQuery, setSearchQuery] = useState("");
+	const filteredAds = adListing.filter((ad) => ad.title.toLowerCase().includes(searchQuery.toLowerCase()));
 
+	const addAdvertisement = () => {
+		chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+			const tabUrl = tabs[0].url;
+			handleDomain(tabUrl, setIsLoading, setAdListing);
+		});
+	};
 	return (
 		<div>
 			<div className="header">
@@ -33,11 +37,7 @@ export const AdWrapper = ({ list }) => {
 					/>
 				</div>
 
-				<button
-					className="add-btn"
-					onClick={() => handleDomain(currentDomainPath, setIsLoading, setAdListing)}
-					disabled={isLoading || isRefreshing}
-				>
+				<button className="add-btn" onClick={addAdvertisement} disabled={isLoading || isRefreshing}>
 					{isLoading ? (
 						"Yükleniyor..."
 					) : (
@@ -87,14 +87,20 @@ export const AdWrapper = ({ list }) => {
 						glassColor="#f0ebd8"
 						color="#979797"
 					/>
-				) : adListing.length > 0 ? (
-					adListing
-						.reverse()
-						.map((ad, index) => (
-							<AdItem key={index} listingData={ad} onDelete={(url) => handleDelete(url, adListing, setAdListing)} />
-						))
+				) : filteredAds.length > 0 ? (
+					filteredAds.reverse().map((listingData, index) => {
+						return (
+							<AdItem
+								key={index}
+								listingData={listingData}
+								onDelete={(adUrl) => handleDelete(adUrl, setAdListing)} // Pass adUrl and setAdListing
+							/>
+						);
+					})
 				) : (
-					<p className="no-ad-warning">Henüz eklenmiş ilan yok.</p>
+					<p className="no-ad-warning">
+						{adListing.length === 0 ? "İlan eklemek için İlan Ekle butonuna tıklayınız." : "No ads match your search."}
+					</p>
 				)}
 			</div>
 		</div>
