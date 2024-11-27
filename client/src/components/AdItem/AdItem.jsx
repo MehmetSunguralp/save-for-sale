@@ -29,7 +29,9 @@ export const AdItem = ({ listingData, onDelete }) => {
 			logo = null;
 	}
 
-	const handleDelete = () => {
+	const handleDelete = (e) => {
+		e.stopPropagation(); // Prevent event propagation to the parent <a>
+		e.preventDefault(); // Prevent navigation triggered by the <a>
 		if (window.confirm("İlanı gerçekten silmek istiyor musun?")) {
 			onDelete(listingData.url); // Trigger the onDelete callback with the item's URL
 		}
@@ -44,7 +46,7 @@ export const AdItem = ({ listingData, onDelete }) => {
 			</div>
 			<img className="site-logo" src={logo} alt="site-logo" />
 			<button className="delete-btn" onClick={handleDelete}>
-				<img src={trashLogo} alt="" />
+				<img src={trashLogo} alt="Delete" />
 			</button>
 		</a>
 	);
