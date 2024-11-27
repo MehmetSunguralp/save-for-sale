@@ -54,18 +54,18 @@ const handleRefreshAll = async (sendResponse) => {
 
 		for (const [index, ad] of existingList.entries()) {
 			try {
+				// Send progress message for each step, starting from 1
+				chrome.runtime.sendMessage({
+					message: "refreshProgress",
+					progress: `Yenileniyor ${index + 1}/${existingList.length}`,
+				});
+
 				const refreshedAd = await createAd(ad.url); // Refresh each ad
 				if (refreshedAd) {
 					updatedList.push(refreshedAd);
 				} else {
 					console.warn("İlan güncellenemedi:", ad.url);
 				}
-
-				// Send progress message for each step
-				chrome.runtime.sendMessage({
-					message: "refreshProgress",
-					progress: `Yenileniyor ${index + 1}/${existingList.length}`,
-				});
 			} catch (error) {
 				console.error("Güncelle sırasında sorun oluştu:", error.message);
 			}
