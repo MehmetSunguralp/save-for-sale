@@ -1,23 +1,26 @@
-const { connect } = require("puppeteer-real-browser");
+// const { connect } = require("puppeteer-real-browser");
 
-let browser = null;
-let page = null;
+// let browser = null;
+// let page = null;
 
-const connectOptions = {
-	headless: true,
-	devtools: true,
-	args: ["--disable-features=site-per-process", "--no-sandbox", "--disable-setuid-sandbox", "--disable-gpu"],
-	customConfig: {},
-	turnstile: true,
-	connectOption: {},
-	disableXvfb: false,
-	ignoreAllFlags: false,
-};
+// const connectOptions = {
+// 	headless: true,
+// 	devtools: true,
+// 	args: ["--disable-features=site-per-process", "--no-sandbox", "--disable-setuid-sandbox", "--disable-gpu"],
+// 	customConfig: {},
+// 	turnstile: true,
+// 	connectOption: {},
+// 	disableXvfb: false,
+// 	ignoreAllFlags: false,
+// };
 
-const viewPortOptions = { width: 1024, height: 768 };
-const ExtraHTTPHeadersOptions = { "accept-language": "en-US,en;q=0.9" };
-const userAgent =
-	"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36";
+// const viewPortOptions = { width: 1024, height: 768 };
+// const ExtraHTTPHeadersOptions = { "accept-language": "en-US,en;q=0.9" };
+// const userAgent =
+// 	"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36";
+
+const antibotbrowser = require("antibotbrowser");
+const puppeteer = require("puppeteer");
 
 async function safeGoto(page, url, retries = 3) {
 	for (let attempt = 1; attempt <= retries; attempt++) {
@@ -40,22 +43,31 @@ async function safeEvaluate(page, selector, evaluateFn, errorMessage) {
 		return null; // Return null if the selector is not found or frame detaches
 	}
 }
-
 async function scrapeWebsite(url, selectors) {
-	try {
-		const { browser: connectedBrowser, page: connectedPage } = await connect(connectOptions);
-		browser = connectedBrowser;
-		//page = connectedPage;
-		const [page] = await browser.pages();
-		await page.setUserAgent(userAgent);
-		await page.setViewport(viewPortOptions);
-		await page.setExtraHTTPHeaders(ExtraHTTPHeadersOptions);
+	let browser = null;
+	let page = null;
 
+	try {
+		// Start browser with antibotbrowser
+		const antibrowser = await antibotbrowser.startbrowser(9222); // Start browser on port 9222
+		browser = await puppeteer.connect({ browserWSEndpoint: antibrowser.websokcet });
+
+		// Create or get the first page
+		const pages = await browser.pages();
+		page = pages.length > 0 ? pages[0] : await browser.newPage();
+
+		// Set basic configurations
+		await page.setUserAgent(
+			"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36"
+		);
+		await page.setViewport({ width: 1024, height: 768 });
+		await page.setExtraHTTPHeaders({ "accept-language": "en-US,en;q=0.9" });
+
+		// Wait for the body and navigate to the URL
 		await page.waitForSelector("body", { timeout: 10000 });
-		// Navigate to URL with retries
 		await safeGoto(page, url);
 
-		// Extract data
+		// Extract data using selectors
 		const src = await safeEvaluate(
 			page,
 			selectors.image,
@@ -76,15 +88,17 @@ async function scrapeWebsite(url, selectors) {
 			(el) => el.textContent.trim(),
 			`Failed to extract price from selector: ${selectors.price}`
 		);
-		// Return extracted data
+
+		// Add optional color field
 		const color = selectors.color;
+
 		return { src, value, title, color, url };
 	} catch (error) {
 		console.error("Scraping failed:", error.message);
 		throw error;
 	} finally {
-		// Ensure page and browser are closed
-		if (page && !page.isClosed()) {
+		// Safely close page and browser
+		if (page) {
 			try {
 				await page.close();
 			} catch (closeError) {
@@ -98,13 +112,12 @@ async function scrapeWebsite(url, selectors) {
 				console.error("Failed to close browser:", closeError.message);
 			}
 		}
-		if (browser && browser.process() != null) browser.process().kill("SIGINT");
 	}
 }
 
 const getFromSahibinden = (url) =>
 	scrapeWebsite(url, {
-		image: ".classifiedDetailMainPhoto #label_images_1 .stdImg",
+		image: ".stdImg",
 		title: ".classifiedDetailTitle h1",
 		price: ".classified-price-wrapper",
 		color: "#FFE800",
