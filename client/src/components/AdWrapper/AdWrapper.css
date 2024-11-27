@@ -63,7 +63,7 @@
 	overflow: auto;
 	scrollbar-gutter: stable;
 	background-color: var(--dark);
-	padding-block: 10px;
+	padding-block: 20px;
 }
 .ad-list-wrapper .no-ad-warning {
 	font-size: 24px;

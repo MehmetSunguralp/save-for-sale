@@ -3,7 +3,7 @@
 .ad-item {
 	display: flex;
 	align-items: center;
-	width: 94%;
+	width: 98%;
 	gap: 30px;
 	padding: 10px 14px;
 	border-radius: 8px;
@@ -21,13 +21,12 @@
 }
 .ad-item .text-content {
 	display: flex;
-	flex-direction: column;
 	align-items: center;
 	gap: 10px;
 }
 .ad-item .text-content .title {
 	text-transform: capitalize;
-	width: 350px;
+	width: 300px;
 	font-weight: 400;
 	color: var(--icy);
 	font-size: 18px;

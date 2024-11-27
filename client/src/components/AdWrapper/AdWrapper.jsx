@@ -124,7 +124,7 @@ export const AdWrapper = ({ list }) => {
 					<Audio
 						height="100"
 						width="100"
-						color="#4fa94d"
+						color="#363636"
 						ariaLabel="loading-spinner"
 						wrapperStyle={{}}
 						wrapperClass="loader-wrapper"
