@@ -41,14 +41,25 @@
 .header .add-btn:hover {
 	background-color: var(--dark2);
 }
-.header .search-input {
+.header .search-wrapper {
+	position: relative;
+	display: flex;
+	align-items: center;
+}
+
+.header .search-wrapper .search-icon {
+	position: absolute;
+	left: 10px;
+	width: 30px;
+}
+.header .search-wrapper .search-input {
 	width: 320px;
 	height: 40px;
 	border-radius: 50px;
 	border: none;
 	background-color: var(--dark2);
 	font-family: var(--font);
-	text-indent: 20px;
+	text-indent: 44px;
 	font-size: 18px;
 	color: var(--white);
 	outline: none;

@@ -1,21 +1,21 @@
 import { useState } from "react";
-import { Audio } from "react-loader-spinner";
+import { MagnifyingGlass } from "react-loader-spinner";
 import { createAd } from "../../utils/api";
 import mainLogo from "/main-logo.png";
 import addIcon from "/add.svg";
 import refreshIcon from "/refresh.svg";
+import searchIcon from "/search.svg";
 import "./AdWrapper.css";
 
 import { AdItem } from "../AdItem/AdItem";
-
+const currentDomainPath =
+	"https://www.sahibinden.com/ilan/emlak-konut-kiralik-tasyaka-mah-cadde-uzerinde-full-esyali-kiralik-cati-dublex-daire-1213713171/detay";
 export const AdWrapper = ({ list }) => {
-	const [isLoading, setIsLoading] = useState(false);
-	const [isRefreshing, setIsRefreshing] = useState(false);
-	const [adListing, setAdListing] = useState(list);
-	const [searchQuery, setSearchQuery] = useState(""); // State to track search input
-
-	const currentDomainPath =
-		"https://www.sahibinden.com/ilan/emlak-konut-kiralik-tasyaka-mah-cadde-uzerinde-full-esyali-kiralik-cati-dublex-daire-1213713171/detay";
+	const [isLoading, setIsLoading] = useState(false); // Genel yüklenme durumu
+	const [loadingMessage, setLoadingMessage] = useState(""); // İlerleme mesajı
+	const [isRefreshing, setIsRefreshing] = useState(false); // Yenileme durumu
+	const [adListing, setAdListing] = useState(list || []); // İlan listesi
+	const [searchQuery, setSearchQuery] = useState(""); // Arama sorgusu
 
 	const handleDomain = () => {
 		let isInstanceOf = false;
@@ -40,13 +40,14 @@ export const AdWrapper = ({ list }) => {
 			setIsLoading(true);
 			createAd(currentDomainPath).finally(() => {
 				setIsLoading(false);
-				setAdListing(JSON.parse(localStorage.getItem("adList")));
+				setAdListing(JSON.parse(localStorage.getItem("adList")) || []); // Default to an empty array if null
 			});
 		} else {
 			setIsLoading(false);
 			alert("Invalid domain!");
 		}
 	};
+
 	const handleDelete = (url) => {
 		const updatedList = adListing.filter((ad) => ad.url !== url);
 		localStorage.setItem("adList", JSON.stringify(updatedList)); // Update localStorage
@@ -54,15 +55,17 @@ export const AdWrapper = ({ list }) => {
 	};
 	const handleRefreshAll = async () => {
 		try {
+			setIsRefreshing(true);
+			setLoadingMessage(""); // Başlangıçta mesajı temizle
+
 			const existingList = JSON.parse(localStorage.getItem("adList")) || [];
 			const updatedList = [];
-			let currentProgress = 0; // To track the current item
 
 			for (const [index, ad] of existingList.entries()) {
-				currentProgress = index + 1; // Update progress
-				setIsLoading(`${currentProgress}/${existingList.length}`); // Show progress as "1/4", "2/4", etc.
+				// İlerleme mesajını ayarla
+				setLoadingMessage(`Yenileniyor ${index + 1}/${existingList.length}`);
 
-				const refreshedAd = await createAd(ad.url); // Call createAd for each URL
+				const refreshedAd = await createAd(ad.url); // Her ilanı yenile
 				if (refreshedAd) {
 					updatedList.push(refreshedAd);
 				} else {
@@ -70,29 +73,27 @@ export const AdWrapper = ({ list }) => {
 				}
 			}
 
-			// Update localStorage with the refreshed list
+			// Yenilenen listeyi güncelle
 			localStorage.setItem("adList", JSON.stringify(updatedList));
-			setAdListing(updatedList); // Update state
-			setIsLoading(false); // Stop showing the progress
+			setAdListing(updatedList);
 		} catch (error) {
 			console.error("Error refreshing ads:", error.message);
-			setIsLoading(false); // Stop loading in case of error
+		} finally {
+			setIsRefreshing(false);
+			setLoadingMessage(""); // İşlem bitince mesajı temizle
 		}
 	};
-
-	// Filter the ad listing based on the search query
-	const filteredAds = adListing.filter((ad) => ad.title.toLowerCase().includes(searchQuery.toLowerCase()));
 
 	return (
 		<div>
 			<div className="header">
-				{/* 		<img src={mainLogo} alt="main-logo" className="main-logo" /> */}
 				<div className="search-wrapper">
+					<img src={searchIcon} alt="search-icon" className="search-icon" />
 					<input
 						type="text"
 						placeholder="İlan ara..."
 						value={searchQuery}
-						onChange={(e) => setSearchQuery(e.target.value)} // Update search query on input change
+						onChange={(e) => setSearchQuery(e.target.value)}
 						className="search-input"
 					/>
 				</div>
@@ -103,46 +104,50 @@ export const AdWrapper = ({ list }) => {
 					) : (
 						<span>
 							İlan Ekle
-							<img src={addIcon} />
+							<img src={addIcon} alt="add-icon" />
 						</span>
 					)}
 				</button>
-				<button className="refresh-btn" onClick={handleRefreshAll} disabled={isLoading}>
-					{isLoading ? (
-						`Yenileniyor ${isLoading}`
+
+				<button className="refresh-btn" onClick={handleRefreshAll} disabled={isRefreshing}>
+					{isRefreshing ? (
+						<span>{loadingMessage || "Yenileniyor..."}</span>
 					) : (
 						<span>
 							Yenile
-							<img src={refreshIcon} />
+							<img src={refreshIcon} alt="refresh-icon" />
 						</span>
 					)}
 				</button>
 			</div>
 
 			<div className="ad-list-wrapper">
-				{isLoading || isRefreshing ? ( // Show loader when loading or refreshing
-					<Audio
-						height="100"
-						width="100"
-						color="#363636"
-						ariaLabel="loading-spinner"
+				{isRefreshing ? (
+					<MagnifyingGlass
+						visible={true}
+						height="200"
+						width="200"
+						ariaLabel="magnifying-glass-loading"
 						wrapperStyle={{}}
-						wrapperClass="loader-wrapper"
+						wrapperClass="magnifying-glass-wrapper"
+						glassColor="#f0ebd8"
+						color="#979797"
 					/>
-				) : filteredAds.length > 0 ? ( // Show filtered ad listings if not loading or refreshing
-					filteredAds.reverse().map((listingData, index) => {
-						return (
-							<AdItem
-								key={index}
-								listingData={listingData}
-								onDelete={handleDelete} // Pass handleDelete as a prop
-							/>
-						);
-					})
+				) : isLoading ? (
+					<MagnifyingGlass
+						visible={true}
+						height="200"
+						width="200"
+						ariaLabel="magnifying-glass-loading"
+						wrapperStyle={{}}
+						wrapperClass="magnifying-glass-wrapper"
+						glassColor="#f0ebd8"
+						color="#979797"
+					/>
+				) : adListing.length > 0 ? (
+					adListing.reverse().map((ad, index) => <AdItem key={index} listingData={ad} onDelete={handleDelete} />)
 				) : (
-					<p className="no-ad-warning">
-						{adListing.length === 0 ? "İlan eklemek için İlan Ekle butonuna tıklayınız." : "No ads match your search."}
-					</p>
+					<p className="no-ad-warning">Henüz eklenmiş ilan yok.</p>
 				)}
 			</div>
 		</div>

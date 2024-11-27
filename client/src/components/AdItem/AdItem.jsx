@@ -30,7 +30,7 @@ export const AdItem = ({ listingData, onDelete }) => {
 	}
 
 	const handleDelete = () => {
-		if (window.confirm("Do you really want to delete this item?")) {
+		if (window.confirm("İlanı gerçekten silmek istiyor musun?")) {
 			onDelete(listingData.url); // Trigger the onDelete callback with the item's URL
 		}
 	};
