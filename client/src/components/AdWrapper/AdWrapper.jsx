@@ -1,28 +1,69 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MagnifyingGlass } from "react-loader-spinner";
-import { handleDomain, handleDelete, handleRefreshAll } from "../../utils/handlers";
 import mainLogo from "/main-logo.png";
 import addIcon from "/add.svg";
 import refreshIcon from "/refresh.svg";
 import searchIcon from "/search.svg";
 import "./AdWrapper.css";
-
 import { AdItem } from "../AdItem/AdItem";
 
 export const AdWrapper = ({ list }) => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [loadingMessage, setLoadingMessage] = useState("");
 	const [isRefreshing, setIsRefreshing] = useState(false);
-	const [adListing, setAdListing] = useState(list || []);
+	const [adListing, setAdListing] = useState([]);
+
 	const [searchQuery, setSearchQuery] = useState("");
 	const filteredAds = adListing.filter((ad) => ad.title.toLowerCase().includes(searchQuery.toLowerCase()));
 
+	useEffect(() => {
+		// Fetch the ad list from chrome.storage.local on component mount
+		chrome.storage.local.get("adList", (result) => {
+			setAdListing(result.adList || []);
+		});
+
+		// Listen for progress updates from the background script
+		const messageListener = (message, sender, sendResponse) => {
+			if (message.message === "refreshProgress") {
+				setLoadingMessage(message.progress);
+			}
+		};
+		chrome.runtime.onMessage.addListener(messageListener);
+
+		// Clean up message listener on component unmount
+		return () => {
+			chrome.runtime.onMessage.removeListener(messageListener);
+		};
+	}, []);
+
 	const addAdvertisement = () => {
+		setIsLoading(true);
 		chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
 			const tabUrl = tabs[0].url;
-			handleDomain(tabUrl, setIsLoading, setAdListing);
+			chrome.runtime.sendMessage({ message: "loadAd", tabUrl: tabUrl }, (response) => {
+				setIsLoading(false);
+				if (response && response.success) {
+					setAdListing(response.adList);
+				} else {
+					alert(response ? response.message : "Failed to get response from background script.");
+				}
+			});
 		});
 	};
+
+	const refreshAdvertisements = () => {
+		setIsRefreshing(true);
+		chrome.runtime.sendMessage({ message: "refreshAds" }, (response) => {
+			setIsRefreshing(false);
+			if (response && response.success) {
+				setAdListing(response.adList);
+			} else {
+				alert(response ? response.message : "Failed to get response from background script.");
+			}
+			setLoadingMessage(""); // Clear message after the process
+		});
+	};
+
 	return (
 		<div>
 			<div className="header">
@@ -48,11 +89,7 @@ export const AdWrapper = ({ list }) => {
 					)}
 				</button>
 
-				<button
-					className="refresh-btn"
-					onClick={() => handleRefreshAll(setIsRefreshing, setLoadingMessage, setAdListing)}
-					disabled={isRefreshing}
-				>
+				<button className="refresh-btn" onClick={refreshAdvertisements} disabled={isRefreshing}>
 					{isRefreshing ? (
 						<span>{loadingMessage || "Yenileniyor..."}</span>
 					) : (
@@ -88,15 +125,13 @@ export const AdWrapper = ({ list }) => {
 						color="#979797"
 					/>
 				) : filteredAds.length > 0 ? (
-					filteredAds.reverse().map((listingData, index) => {
-						return (
-							<AdItem
-								key={index}
-								listingData={listingData}
-								onDelete={(adUrl) => handleDelete(adUrl, setAdListing)} // Pass adUrl and setAdListing
-							/>
-						);
-					})
+					filteredAds.reverse().map((listingData, index) => (
+						<AdItem
+							key={index}
+							listingData={listingData}
+							onDelete={(adUrl) => handleDelete(adUrl, setAdListing)} // Pass adUrl and setAdListing
+						/>
+					))
 				) : (
 					<p className="no-ad-warning">
 						{adListing.length === 0 ? "İlan eklemek için İlan Ekle butonuna tıklayınız." : "No ads match your search."}

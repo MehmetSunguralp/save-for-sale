@@ -4,7 +4,20 @@
 	"version": "1.0",
 	"description": "Save advertisements",
 	"action": {
-		"default_popup": "index.html"
+		"default_popup": "index.html",
+		"default_icon": {
+			"16": "icons/icon16.png",
+			"48": "icons/icon48.png",
+			"128": "icons/icon128.png"
+		}
 	},
-	"permissions": ["activeTab", "storage", "tabs"]
+	"permissions": ["activeTab", "storage", "tabs", "scripting"],
+	"background": {
+		"service_worker": "background.js"
+	},
+	"icons": {
+		"16": "icons/icon16.png",
+		"48": "icons/icon48.png",
+		"128": "icons/icon128.png"
+	}
 }
