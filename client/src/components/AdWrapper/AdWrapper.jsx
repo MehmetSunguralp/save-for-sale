@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { MagnifyingGlass } from "react-loader-spinner";
-import { createAd } from "../../utils/api";
+import { handleDomain, handleDelete, handleRefreshAll } from "../../utils/handlers";
 import mainLogo from "/main-logo.png";
 import addIcon from "/add.svg";
 import refreshIcon from "/refresh.svg";
@@ -8,81 +8,16 @@ import searchIcon from "/search.svg";
 import "./AdWrapper.css";
 
 import { AdItem } from "../AdItem/AdItem";
+
 const currentDomainPath =
 	"https://www.sahibinden.com/ilan/emlak-konut-kiralik-tasyaka-mah-cadde-uzerinde-full-esyali-kiralik-cati-dublex-daire-1213713171/detay";
+
 export const AdWrapper = ({ list }) => {
-	const [isLoading, setIsLoading] = useState(false); // Genel yüklenme durumu
-	const [loadingMessage, setLoadingMessage] = useState(""); // İlerleme mesajı
-	const [isRefreshing, setIsRefreshing] = useState(false); // Yenileme durumu
-	const [adListing, setAdListing] = useState(list || []); // İlan listesi
-	const [searchQuery, setSearchQuery] = useState(""); // Arama sorgusu
-
-	const handleDomain = () => {
-		let isInstanceOf = false;
-		const existingList = JSON.parse(localStorage.getItem("adList"));
-		if (existingList) {
-			existingList.some((ad) => {
-				if (ad.url === currentDomainPath) {
-					isInstanceOf = true;
-					return true;
-				}
-			});
-		}
-		if (isInstanceOf) {
-			alert("URL already exists: " + currentDomainPath);
-		} else if (
-			currentDomainPath.includes("https://www.sahibinden.com/ilan") ||
-			currentDomainPath.includes("https://www.emlakjet.com/ilan") ||
-			currentDomainPath.includes("https://www.hepsiemlak.com") ||
-			currentDomainPath.includes("https://www.arabam.com/ilan") ||
-			(currentDomainPath.includes("https://www.letgo.com/item") && isInstanceOf === false)
-		) {
-			setIsLoading(true);
-			createAd(currentDomainPath).finally(() => {
-				setIsLoading(false);
-				setAdListing(JSON.parse(localStorage.getItem("adList")) || []); // Default to an empty array if null
-			});
-		} else {
-			setIsLoading(false);
-			alert("Invalid domain!");
-		}
-	};
-
-	const handleDelete = (url) => {
-		const updatedList = adListing.filter((ad) => ad.url !== url);
-		localStorage.setItem("adList", JSON.stringify(updatedList)); // Update localStorage
-		setAdListing(updatedList); // Update state
-	};
-	const handleRefreshAll = async () => {
-		try {
-			setIsRefreshing(true);
-			setLoadingMessage(""); // Başlangıçta mesajı temizle
-
-			const existingList = JSON.parse(localStorage.getItem("adList")) || [];
-			const updatedList = [];
-
-			for (const [index, ad] of existingList.entries()) {
-				// İlerleme mesajını ayarla
-				setLoadingMessage(`Yenileniyor ${index + 1}/${existingList.length}`);
-
-				const refreshedAd = await createAd(ad.url); // Her ilanı yenile
-				if (refreshedAd) {
-					updatedList.push(refreshedAd);
-				} else {
-					console.warn("Failed to refresh ad:", ad.url);
-				}
-			}
-
-			// Yenilenen listeyi güncelle
-			localStorage.setItem("adList", JSON.stringify(updatedList));
-			setAdListing(updatedList);
-		} catch (error) {
-			console.error("Error refreshing ads:", error.message);
-		} finally {
-			setIsRefreshing(false);
-			setLoadingMessage(""); // İşlem bitince mesajı temizle
-		}
-	};
+	const [isLoading, setIsLoading] = useState(false); // General loading state
+	const [loadingMessage, setLoadingMessage] = useState(""); // Progress message
+	const [isRefreshing, setIsRefreshing] = useState(false); // Refresh state
+	const [adListing, setAdListing] = useState(list || []); // Ad list
+	const [searchQuery, setSearchQuery] = useState(""); // Search query
 
 	return (
 		<div>
@@ -98,7 +33,11 @@ export const AdWrapper = ({ list }) => {
 					/>
 				</div>
 
-				<button className="add-btn" onClick={handleDomain} disabled={isLoading || isRefreshing}>
+				<button
+					className="add-btn"
+					onClick={() => handleDomain(currentDomainPath, setIsLoading, setAdListing)}
+					disabled={isLoading || isRefreshing}
+				>
 					{isLoading ? (
 						"Yükleniyor..."
 					) : (
@@ -109,7 +48,11 @@ export const AdWrapper = ({ list }) => {
 					)}
 				</button>
 
-				<button className="refresh-btn" onClick={handleRefreshAll} disabled={isRefreshing}>
+				<button
+					className="refresh-btn"
+					onClick={() => handleRefreshAll(setIsRefreshing, setLoadingMessage, setAdListing)}
+					disabled={isRefreshing}
+				>
 					{isRefreshing ? (
 						<span>{loadingMessage || "Yenileniyor..."}</span>
 					) : (
@@ -145,7 +88,11 @@ export const AdWrapper = ({ list }) => {
 						color="#979797"
 					/>
 				) : adListing.length > 0 ? (
-					adListing.reverse().map((ad, index) => <AdItem key={index} listingData={ad} onDelete={handleDelete} />)
+					adListing
+						.reverse()
+						.map((ad, index) => (
+							<AdItem key={index} listingData={ad} onDelete={(url) => handleDelete(url, adListing, setAdListing)} />
+						))
 				) : (
 					<p className="no-ad-warning">Henüz eklenmiş ilan yok.</p>
 				)}
