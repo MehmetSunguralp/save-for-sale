@@ -1,43 +1,67 @@
 @import url("../../_variables.css");
 
 .header {
-	height: 50px;
+	height: 60px;
 	display: flex;
 	align-items: center;
 	justify-content: space-around;
-	background-color: var(--light);
+	background-color: var(--mid);
 }
 .header .main-logo {
 	width: 40px;
 }
 
-.header .add-btn {
+.header .add-btn,
+.header .refresh-btn {
+	display: flex;
+	justify-content: center;
+	align-items: center;
 	font-family: var(--font);
 	font-size: 18px;
 	height: 36px;
-	width: 120px;
+	width: 160px;
 	border-radius: 100px;
 	border: none;
-	background-color: var(--mid);
+	background-color: var(--dark);
 	color: var(--white);
 	font-weight: 500;
 	transition: all 0.2s ease-in-out;
 	cursor: pointer;
 }
+.header .add-btn span,
+.header .refresh-btn span {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+.header .add-btn span img,
+.header .refresh-btn span img {
+	width: 20px;
+}
 .header .add-btn:hover {
-	background-color: var(--white);
-	color: var(--mid);
+	background-color: var(--dark2);
+}
+.header .search-input {
+	width: 320px;
+	height: 40px;
+	border-radius: 50px;
+	border: none;
+	background-color: var(--dark2);
+	font-family: var(--font);
+	text-indent: 20px;
+	font-size: 18px;
+	color: var(--white);
+	outline: none;
 }
 
 .ad-list-wrapper {
 	display: flex;
 	flex-direction: column;
-	gap: 10px;
+	gap: 20px;
 	align-items: center;
 	height: 540px;
 	overflow: auto;
 	scrollbar-gutter: stable;
-	/* background-color: var(--dark); */
 	background-color: var(--dark);
 	padding-block: 10px;
 }
@@ -55,9 +79,9 @@
 }
 
 ::-webkit-scrollbar-track {
-	background: #3e5c76;
+	background: var(--mid);
 }
 
 ::-webkit-scrollbar-thumb {
-	background: #748cab;
+	background: var(--light);
 }

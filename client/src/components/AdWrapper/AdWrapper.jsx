@@ -1,9 +1,11 @@
-import { createAd } from "../../utils/api";
+import { useState } from "react";
 import { Audio } from "react-loader-spinner";
+import { createAd } from "../../utils/api";
 import mainLogo from "/main-logo.png";
+import addIcon from "/add.svg";
+import refreshIcon from "/refresh.svg";
 import "./AdWrapper.css";
 
-import { useState } from "react";
 import { AdItem } from "../AdItem/AdItem";
 
 export const AdWrapper = ({ list }) => {
@@ -12,7 +14,8 @@ export const AdWrapper = ({ list }) => {
 	const [adListing, setAdListing] = useState(list);
 	const [searchQuery, setSearchQuery] = useState(""); // State to track search input
 
-	const currentDomainPath = "https://www.emlakjet.com/ilan/seyhan-mah-kosu-izban-yakini-satilik-3-kat-mustakil-12103920/";
+	const currentDomainPath =
+		"https://www.sahibinden.com/ilan/emlak-konut-kiralik-tasyaka-mah-cadde-uzerinde-full-esyali-kiralik-cati-dublex-daire-1213713171/detay";
 
 	const handleDomain = () => {
 		let isInstanceOf = false;
@@ -83,25 +86,37 @@ export const AdWrapper = ({ list }) => {
 	return (
 		<div>
 			<div className="header">
-				<img src={mainLogo} alt="main-logo" className="main-logo" />
+				{/* 		<img src={mainLogo} alt="main-logo" className="main-logo" /> */}
 				<div className="search-wrapper">
 					<input
 						type="text"
-						placeholder="Search by title..."
+						placeholder="İlan ara..."
 						value={searchQuery}
 						onChange={(e) => setSearchQuery(e.target.value)} // Update search query on input change
 						className="search-input"
 					/>
 				</div>
 
-				<div>
-					<button className="add-btn" onClick={handleDomain} disabled={isLoading || isRefreshing}>
-						{isLoading ? "Yükleniyor..." : "İlan Ekle"}
-					</button>
-					<button className="refresh-btn" onClick={handleRefreshAll} disabled={isLoading}>
-						{isLoading ? `Refreshing ${isLoading}` : "Refresh All"}
-					</button>
-				</div>
+				<button className="add-btn" onClick={handleDomain} disabled={isLoading || isRefreshing}>
+					{isLoading ? (
+						"Yükleniyor..."
+					) : (
+						<span>
+							İlan Ekle
+							<img src={addIcon} />
+						</span>
+					)}
+				</button>
+				<button className="refresh-btn" onClick={handleRefreshAll} disabled={isLoading}>
+					{isLoading ? (
+						`Yenileniyor ${isLoading}`
+					) : (
+						<span>
+							Yenile
+							<img src={refreshIcon} />
+						</span>
+					)}
+				</button>
 			</div>
 
 			<div className="ad-list-wrapper">

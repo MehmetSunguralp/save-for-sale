@@ -4,16 +4,17 @@
 	display: flex;
 	align-items: center;
 	width: 94%;
-	justify-content: space-around;
-	padding: 14px;
-	border-radius: 20px;
+	gap: 30px;
+	padding: 10px 14px;
+	border-radius: 8px;
 	background-color: var(--mid);
 	transition: all 0.2s ease-in-out;
+	position: relative;
 }
 
 .ad-item .thumbnail {
-	width: 100px;
-	height: 100px;
+	width: 80px;
+	height: 80px;
 	object-fit: cover;
 	border-radius: 10px;
 	box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.5);
@@ -22,14 +23,14 @@
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	gap: 18px;
+	gap: 10px;
 }
 .ad-item .text-content .title {
 	text-transform: capitalize;
-	width: 30ch;
+	width: 350px;
 	font-weight: 400;
 	color: var(--icy);
-	text-align: center;
+	font-size: 18px;
 }
 .ad-item .text-content .price {
 	font-size: 24px;
@@ -37,10 +38,30 @@
 	color: var(--white);
 }
 
-.site-logo {
-	width: 50px;
+.ad-item .site-logo {
+	width: 30px;
+	position: absolute;
+	right: 10px;
+	bottom: 10px;
 }
 
+.ad-item .delete-btn {
+	background-color: transparent;
+	border: none;
+	position: absolute;
+	right: 10px;
+	top: 10px;
+	cursor: pointer;
+	border-radius: 4px;
+	transition: all 0.2s ease-in-out;
+}
+.ad-item .delete-btn:hover {
+	background-color: var(--dark);
+}
+.ad-item .delete-btn img {
+	width: 30px;
+	height: 30px;
+}
 .ad-item:hover {
-	background-color: var(--light);
+	opacity: 0.8;
 }
