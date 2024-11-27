@@ -5,7 +5,8 @@ import hepsiemlak from "/hepsiemlak.svg";
 import arabam from "/arabam.svg";
 
 import "./AdItem.css";
-export const AdItem = ({ listingData }) => {
+
+export const AdItem = ({ listingData, onDelete }) => {
 	let logo;
 	switch (listingData.color) {
 		case "#FFE800":
@@ -23,16 +24,30 @@ export const AdItem = ({ listingData }) => {
 		case "#F9011B":
 			logo = arabam;
 			break;
+		default:
+			logo = null;
 	}
 
+	const handleDelete = () => {
+		if (window.confirm("Do you really want to delete this item?")) {
+			onDelete(listingData.url); // Trigger the onDelete callback with the item's URL
+		}
+	};
+
 	return (
-		<a href={listingData.url} target="_blank" className="ad-item">
-			<img src={listingData.src} alt="ad-thumbnail" className="thumbnail" />
-			<div className="text-content">
-				<h2 className="title">{listingData.title}</h2>
-				<p className="price">{listingData.price}</p>
-			</div>
-			<img className="site-logo" src={logo} alt="site-logo" />
-		</a>
+		<div className="ad-item">
+			<a href={listingData.url} target="_blank" rel="noopener noreferrer">
+				<img src={listingData.src} alt="ad-thumbnail" className="thumbnail" />
+				<div className="text-content">
+					<h2 className="title">{listingData.title}</h2>
+					<p className="price">{listingData.price}</p>
+				</div>
+				<img className="site-logo" src={logo} alt="site-logo" />
+			</a>
+			{/* Delete Button */}
+			<button className="delete-btn" onClick={handleDelete}>
+				Delete
+			</button>
+		</div>
 	);
 };

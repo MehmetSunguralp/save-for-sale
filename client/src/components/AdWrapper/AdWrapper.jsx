@@ -10,8 +10,9 @@ export const AdWrapper = ({ list }) => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [isRefreshing, setIsRefreshing] = useState(false);
 	const [adListing, setAdListing] = useState(list);
+	const [searchQuery, setSearchQuery] = useState(""); // State to track search input
 
-	const currentDomainPath = "https://www.letgo.com/item/bugaboo-bee-bebek-arabas-iid-1694381927";
+	const currentDomainPath = "https://www.emlakjet.com/ilan/seyhan-mah-kosu-izban-yakini-satilik-3-kat-mustakil-12103920/";
 
 	const handleDomain = () => {
 		let isInstanceOf = false;
@@ -43,36 +44,11 @@ export const AdWrapper = ({ list }) => {
 			alert("Invalid domain!");
 		}
 	};
-
-	// const handleRefreshAll = async () => {
-	// 	const existingList = JSON.parse(localStorage.getItem("adList"));
-	// 	if (!existingList || existingList.length === 0) {
-	// 		alert("No ads to refresh.");
-	// 		return;
-	// 	}
-
-	// 	setIsRefreshing(true);
-	// 	const refreshedAds = [];
-	// 	//localStorage.removeItem("adList");
-	// 	for (const ad of existingList) {
-	// 		try {
-	// 			// Refresh ad by calling createAd with the ad's URL
-
-	// 			const refreshedAd = await createAd(ad.url)
-	// 			refreshedAds.push(refreshedAd);
-	// 			//console.log(refreshedAds);
-	// 		} catch (error) {
-	// 			console.error(`Failed to refresh ad with URL ${ad.url}:`, error);
-	// 			// Optionally push the old ad if the refresh fails
-	// 			refreshedAds.push(ad);
-	// 		}
-	// 	}
-
-	// 	// Update localStorage and state with refreshed ads
-	// 	localStorage.setItem("adList", JSON.stringify(refreshedAds));
-	// 	setAdListing(refreshedAds);
-	// 	setIsRefreshing(false);
-	// };
+	const handleDelete = (url) => {
+		const updatedList = adListing.filter((ad) => ad.url !== url);
+		localStorage.setItem("adList", JSON.stringify(updatedList)); // Update localStorage
+		setAdListing(updatedList); // Update state
+	};
 	const handleRefreshAll = async () => {
 		try {
 			const existingList = JSON.parse(localStorage.getItem("adList")) || [];
@@ -101,10 +77,23 @@ export const AdWrapper = ({ list }) => {
 		}
 	};
 
+	// Filter the ad listing based on the search query
+	const filteredAds = adListing.filter((ad) => ad.title.toLowerCase().includes(searchQuery.toLowerCase()));
+
 	return (
 		<div>
 			<div className="header">
 				<img src={mainLogo} alt="main-logo" className="main-logo" />
+				<div className="search-wrapper">
+					<input
+						type="text"
+						placeholder="Search by title..."
+						value={searchQuery}
+						onChange={(e) => setSearchQuery(e.target.value)} // Update search query on input change
+						className="search-input"
+					/>
+				</div>
+
 				<div>
 					<button className="add-btn" onClick={handleDomain} disabled={isLoading || isRefreshing}>
 						{isLoading ? "Yükleniyor..." : "İlan Ekle"}
@@ -114,6 +103,7 @@ export const AdWrapper = ({ list }) => {
 					</button>
 				</div>
 			</div>
+
 			<div className="ad-list-wrapper">
 				{isLoading || isRefreshing ? ( // Show loader when loading or refreshing
 					<Audio
@@ -124,13 +114,19 @@ export const AdWrapper = ({ list }) => {
 						wrapperStyle={{}}
 						wrapperClass="loader-wrapper"
 					/>
-				) : adListing ? ( // Show ad listings if not loading or refreshing
-					adListing.reverse().map((listingData, index) => {
-						return <AdItem listingData={listingData} key={index} />;
+				) : filteredAds.length > 0 ? ( // Show filtered ad listings if not loading or refreshing
+					filteredAds.reverse().map((listingData, index) => {
+						return (
+							<AdItem
+								key={index}
+								listingData={listingData}
+								onDelete={handleDelete} // Pass handleDelete as a prop
+							/>
+						);
 					})
 				) : (
 					<p className="no-ad-warning">
-						İlan eklemek için <span>İlan Ekle</span> butonuna tıklayınız.
+						{adListing.length === 0 ? "İlan eklemek için İlan Ekle butonuna tıklayınız." : "No ads match your search."}
 					</p>
 				)}
 			</div>
